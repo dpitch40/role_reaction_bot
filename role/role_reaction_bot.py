@@ -3,8 +3,10 @@
 
 Permissions needed:
 
-    manage_messages
     send_messages
+    read_message_history
+    add_reactions
+    manage_messages
     manage_roles
 
 Also requires server members intent.
@@ -15,6 +17,7 @@ import collections
 
 import discord
 from discord.ext import commands
+from emoji import UNICODE_EMOJI
 
 from role import logger
 
@@ -22,6 +25,7 @@ intents = discord.Intents.default()
 intents.members = True
 
 CHANNEL_NAME = 'roles'
+ENGLISH_EMOJI = set(UNICODE_EMOJI['en'].keys())
 
 def channel_match(channel):
     return channel.name == CHANNEL_NAME
@@ -38,10 +42,14 @@ def parse_emoji(message):
         m = role_re.search(line)
         if m:
             role = id_mapping[m.group(1)]
-            line = line.replace(m.group(0), '').strip()
-            emoji_to_role_mapping[line] = role
+            emoji = line.replace(m.group(0), '').strip()
+            if emoji not in ENGLISH_EMOJI:
+                logger.warning('Invalid emoji for role %s: %s', role.name, emoji)
+                continue
+            emoji_to_role_mapping[emoji] = role
 
-    logger.info('Parsed %d emoji from message by @%s', len(emoji_to_role_mapping), message.author.name)
+    logger.info('Parsed %d emoji/role pairs from message by @%s',
+        len(emoji_to_role_mapping), message.author.name)
     logger.debug(str(dict(emoji_to_role_mapping)))
 
     return emoji_to_role_mapping
