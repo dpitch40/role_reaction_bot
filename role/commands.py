@@ -1,7 +1,7 @@
 from .role_reaction_bot import client
 
 @client.command()
-async def inrole(ctx, *role):
+async def inrole(ctx):
     for role in ctx.message.role_mentions:
         members = role.members
         joined_names = '\n'.join(sorted([f'> {member.name}' for member in members]))
