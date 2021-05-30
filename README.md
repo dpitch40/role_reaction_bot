@@ -40,6 +40,10 @@ Checks what the name of the channel being watched for roles is. Defaults to 'rol
 
 ### `$set_roles_channel`
 
-Sets the name of the channel being watched for roles. Enter the channel name as the argument. Only works for members with administrator privileges.
+Sets the name of the channel being watched for roles. Enter the channel name as the argument.
 
 ![$inrole example](screenshots/set_roles_channel_example.png)
+
+This only works for members with administrator privileges.
+
+![$inrole example](screenshots/set_roles_channel_fail_example.png)
