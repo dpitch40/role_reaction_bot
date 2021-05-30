@@ -12,8 +12,11 @@ Permissions needed:
 Also requires server members intent.
 """
 
+import os
 import re
 import collections
+import os.path
+import json
 
 import discord
 from discord.ext import commands
@@ -24,11 +27,9 @@ from role import logger
 intents = discord.Intents.default()
 intents.members = True
 
-CHANNEL_NAME = 'roles'
+DEFAULT_CHANNEL_NAME = 'roles'
 ENGLISH_EMOJI = set(UNICODE_EMOJI['en'].keys())
-
-def channel_match(channel):
-    return channel.name == CHANNEL_NAME
+CHANNEL_FILE = os.getenv('CHANNEL_FILE', 'role_channels.json')
 
 def parse_emoji(message):
     guild = message.guild
@@ -69,6 +70,32 @@ async def update_message_reactions(message):
 class RoleReactionClient(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix='$', intents=intents)
+        self.channel_file = CHANNEL_FILE
+        self.get_channel_mapping()
+
+    def get_channel_mapping(self):
+        if not os.path.isfile(self.channel_file):
+            self.role_channels = dict()
+            logger.info('Channel file not found at %s', self.channel_file)
+        else:
+            with open(self.channel_file, 'r') as fobj:
+                self.role_channels = json.load(fobj)
+                logger.info('Loaded %d role channels from %s', len(self.role_channels), self.channel_file)
+
+    def update_channel_mapping(self, guild, channel_name):
+        if channel_name == DEFAULT_CHANNEL_NAME:
+            logger.info('Resetting role channel for %s to default', guild.name)
+            if guild.name in self.role_channels:
+                del self.role_channels[guild.name]
+        else:
+            logger.info('Setting role channel for %s to %s', guild.name, channel_name)
+            self.role_channels[guild.name] = channel_name
+        with open(self.channel_file, 'w') as fobj:
+            json.dump(self.role_channels, fobj, indent=2)
+            logger.info('Saved %d role channels to %s', len(self.role_channels), self.channel_file)
+
+    def channel_match(self, channel):
+        return channel.name == self.role_channels.get(channel.guild.name, DEFAULT_CHANNEL_NAME)
 
     async def on_ready(self):
         logger.info('Logged in as %s', self.user)
@@ -76,20 +103,20 @@ class RoleReactionClient(commands.Bot):
     async def on_message(self, message):
         await super().on_message(message)
         logger.debug('ON_MESSAGE', extra={'guild': message.guild})
-        if channel_match(message.channel):
+        if self.channel_match(message.channel):
             await update_message_reactions(message)
 
     async def on_raw_message_edit(self, payload):
         channel = self.get_channel(payload.channel_id)
         logger.debug('ON_RAW_MESSAGE_EDIT', extra={'guild': channel.guild})
-        if channel_match(channel):
+        if self.channel_match(channel):
             message = await channel.fetch_message(payload.message_id)
             await update_message_reactions(message)
 
     async def on_raw_reaction_add(self, payload):
         channel = self.get_channel(payload.channel_id)
         logger.debug('ON_RAW_REACTION_ADD', extra={'guild': channel.guild})
-        if channel_match(channel):
+        if self.channel_match(channel):
             member = payload.member
             if member == self.user:
                 return
@@ -117,7 +144,7 @@ class RoleReactionClient(commands.Bot):
     async def on_raw_reaction_remove(self, payload):
         channel = self.get_channel(payload.channel_id)
         logger.debug('ON_RAW_REACTION_REMOVE', extra={'guild': channel.guild})
-        if channel_match(channel):
+        if self.channel_match(channel):
             guild = self.get_guild(payload.guild_id)
             member = guild.get_member(payload.user_id)
             if member != self.user:
@@ -125,5 +152,8 @@ class RoleReactionClient(commands.Bot):
 
             message = await channel.fetch_message(payload.message_id)
             await update_message_reactions(message)
+
+    async def on_error(self, event, *args, **kwargs):
+        logger.error('Some bug happened %s', event, exc_info=True)
 
 client = RoleReactionClient()
