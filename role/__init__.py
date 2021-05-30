@@ -10,6 +10,9 @@ class GuildNameFilter(logging.Filter):
             record.guildname = ''
         return True
 
+log_level = os.getenv('LOG_LEVEL', 'INFO')
+LOG_LEVEL = getattr(logging, log_level, logging.INFO)
+
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -29,20 +32,20 @@ LOGGING_CONFIG = {
     'handlers': {
         'stream': {
             'class': 'logging.StreamHandler',
-            'level': logging.INFO,
+            'level': LOG_LEVEL,
             'formatter': 'default',
             'stream': 'ext://sys.stdout'
         },
         'discord_stream': {
             'class': 'logging.StreamHandler',
-            'level': logging.INFO,
+            'level': LOG_LEVEL,
             'formatter': 'discord',
             'stream': 'ext://sys.stdout'
         }
     },
     'loggers': {
         'role_bot': {
-            'level': logging.INFO,
+            'level': LOG_LEVEL,
             'propagate': False,
             'handlers': ['discord_stream'],
             'filters': ['add_guild_name']
@@ -57,7 +60,7 @@ LOGGING_CONFIG = {
 if 'LOGFILE' in os.environ:
     LOGGING_CONFIG['handlers']['file'] = {
         'class': 'logging.handlers.RotatingFileHandler',
-        'level': logging.INFO,
+        'level': LOG_LEVEL,
         'formatter': 'default',
         'filename': os.environ['LOGFILE'],
         'maxBytes': 2 ** 20,

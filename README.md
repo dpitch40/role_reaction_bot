@@ -12,7 +12,7 @@ Select the server you control that you want to add it to and grant the permissio
 
 ## How it Works
 
-The bot lists for activity on a channel called #roles. (The expected name is currently not changeable) This channel is assumed to be restricted for most server members so they can't post messages or add reactions.
+The bot listens for activity on a channel called (by default) #roles. (This can be changed, see the Commands section below) This channel is assumed to be restricted for most server members so they can't post messages or add reactions.
 
 Specifically, the bot looks for messages in this channel consisting of a series of lines, each containing an emoji and a role mention. When such a message is added or edited, it will automatically add a reaction to the message for each detected emoji. Example:
 
@@ -26,10 +26,20 @@ Use only standard (not custom/uploaded) emoji for the bot. The emoji library use
 
 ## Commands
 
-Currently only one command, `inrole`, is implemented.
-
 ### `$inrole`
 
-Enter the command `$inrole`, then mention one or more roles. The bot will list the members that belong to each role.
+Enter the command `$inrole`, then the name of a role (do not actually mention it). The bot will list the members that belong to each role.
 
 ![$inrole example](screenshots/inrole_example.png)
+
+### `$get_roles_channel`
+
+Checks what the name of the channel being watched for roles is. Defaults to 'roles'
+
+![$inrole example](screenshots/get_roles_channel_example.png)
+
+### `$set_roles_channel`
+
+Sets the name of the channel being watched for roles. Enter the channel name as the argument. Only works for members with administrator privileges.
+
+![$inrole example](screenshots/set_roles_channel_example.png)
