@@ -27,7 +27,7 @@ async def get_roles_channel(ctx):
 @client.command()
 async def set_roles_channel(ctx, new_name):
     if not ctx.author.permissions_in(ctx.message.channel).administrator:
-        await ctx.send(f"I'm sorry, {ctx.author.name}. I can't do that. (Because you aren't admin)")
+        await ctx.send(f"I'm sorry {ctx.author.name}, I'm afraid I can't do that. (Because you aren't admin)")
         return
     channel_name = client.role_channels.get(ctx.guild.name, DEFAULT_CHANNEL_NAME)
     for channel in ctx.guild.channels:
