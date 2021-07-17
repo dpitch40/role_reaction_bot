@@ -20,7 +20,7 @@ import json
 
 import discord
 from discord.ext import commands
-from emoji import UNICODE_EMOJI
+from .emoji import load_emoji
 
 from role import logger
 
@@ -28,7 +28,7 @@ intents = discord.Intents.default()
 intents.members = True
 
 DEFAULT_CHANNEL_NAME = 'roles'
-ENGLISH_EMOJI = set(UNICODE_EMOJI['en'].keys())
+ENGLISH_EMOJI = load_emoji()
 CHANNEL_FILE = os.getenv('CHANNEL_FILE', 'role_channels.json')
 
 def parse_emoji(message):
