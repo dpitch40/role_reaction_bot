@@ -67,18 +67,18 @@ async def create_role(ctx,
         discord.SlashCommandOptionType.string,
         description="The name of the role to add",
         required=True),
-    character: discord.Option(
-        discord.SlashCommandOptionType.string,
-        description="Character(s) the role pertains to",
-        required=True),
+    # character: discord.Option(
+    #     discord.SlashCommandOptionType.string,
+    #     description="Character(s) the role pertains to",
+    #     required=True),
     color: discord.Option(
         discord.SlashCommandOptionType.string,
         description="Role color, in #xxxxxx format",
         required=True),
-    description: discord.Option(
-        discord.SlashCommandOptionType.string,
-        description="Additional description of the role",
-        required=False)
+    # description: discord.Option(
+    #     discord.SlashCommandOptionType.string,
+    #     description="Additional description of the role",
+    #     required=False),
 ):
     for role in ctx.guild.roles:
         if role.name == name:
