@@ -71,7 +71,7 @@ class RoleReactionClient(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix='$', intents=intents)
         self.channel_file = CHANNEL_FILE
-        self.get_channel_mapping()
+        # self.get_channel_mapping()
 
     # def get_channel_mapping(self):
     #     if not os.path.isfile(self.channel_file):
