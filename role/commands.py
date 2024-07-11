@@ -25,6 +25,17 @@ def parse_color_string(s):
         raise ValueError("Invalid color string format")
     return r, g, b
 
+
+def is_assignable(role):
+    # Returns None if the role is assignable, a reason otherwise
+    if role.is_bot_managed():
+        return "You can't fool me, you aren't a bot"
+    if role.is_premium_subscriber():
+        return "Nice try, cheapskate"
+    if role.is_integration() or not role.is_assignable():
+        return "Can't apply this role"
+    return None
+
 @client.slash_command(description="Check who has a pingable role")
 async def inrole(ctx,
     role: discord.Option(
@@ -102,12 +113,8 @@ async def apply_role(ctx,
         description="The role to add",
         required=True),
 ):
-    if role.is_bot_managed():
-        return await ctx.respond("You can't fool me, you aren't a bot")
-    if role.is_premium_subscriber():
-        return await ctx.respond("Nice try, cheapskate")
-    if role.is_integration() or not role.is_assignable():
-        return await ctx.respond("Can't apply this role")
+    if assignable := is_assignable is not None:
+        return await ctx.respond(assignable)
     await ctx.author.add_roles(role)
     await ctx.respond(f"Added you to {role.name}")
 
@@ -118,11 +125,7 @@ async def remove_role(ctx,
         description="The role to remove",
         required=True),
 ):
-    if role.is_bot_managed():
-        return await ctx.respond("You can't fool me, you aren't a bot")
-    if role.is_premium_subscriber():
-        return await ctx.respond("Nice try, cheapskate")
-    if role.is_integration() or not role.is_assignable():
-        return await ctx.respond("Can't apply this role")
+    if assignable := is_assignable is not None:
+        return await ctx.respond(assignable)
     await ctx.author.remove_roles(role)
     await ctx.respond(f"Removed you from {role.name}")
