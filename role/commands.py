@@ -113,7 +113,7 @@ async def apply_role(ctx,
         description="The role to add",
         required=True),
 ):
-    if assignable := is_assignable is not None:
+    if assignable := is_assignable(role) is not None:
         return await ctx.respond(assignable)
     await ctx.author.add_roles(role)
     await ctx.respond(f"Added you to {role.name}")
@@ -125,7 +125,7 @@ async def remove_role(ctx,
         description="The role to remove",
         required=True),
 ):
-    if assignable := is_assignable is not None:
+    if assignable := is_assignable(role) is not None:
         return await ctx.respond(assignable)
     await ctx.author.remove_roles(role)
     await ctx.respond(f"Removed you from {role.name}")

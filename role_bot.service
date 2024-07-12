@@ -5,7 +5,7 @@ Description=Discord role bot service
 User=ec2-user
 WorkingDirectory=/home/ec2-user/role_reaction_bot
 EnvironmentFile=/etc/sysconfig/role_bot
-ExecStart=/usr/local/bin/python3.9 role_bot.py
+ExecStart=/usr/bin/python3 role_bot.py
 Restart=always
 
 [Install]
