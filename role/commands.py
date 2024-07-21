@@ -33,7 +33,7 @@ def is_assignable(role):
     if role.is_premium_subscriber():
         return "Nice try, cheapskate"
     if role.is_integration() or not role.is_assignable():
-        return "Can't apply this role"
+        return "Can't apply this role (it may be listed above the bot role)"
     return None
 
 @client.slash_command(description="Check who has a pingable role")
@@ -113,7 +113,7 @@ async def apply_role(ctx,
         description="The role to add",
         required=True),
 ):
-    if assignable := is_assignable(role) is not None:
+    if (assignable := is_assignable(role)) is not None:
         return await ctx.respond(assignable)
     await ctx.author.add_roles(role)
     await ctx.respond(f"Added you to {role.name}")
